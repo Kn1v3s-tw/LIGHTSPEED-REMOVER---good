@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">    <title>School Extension Remover</title>
+    <style>
+        body { font-family: Arial; background: #000; color: #0f0; padding: 20px;} pre { background: #111; padding: 15px; border: 1px solid #0f0;} </style>
+</head>
+<body>
+    <h1>School Extension Killer Active</h1>
+    <p>Running bypass routines...</p>
+    <pre id="log">Initializing...</pre>
+<script>
+// List of known school extension IDs (updated 2025)const blockedExtensions = ["nkeimhogjdpnpccoofpliimaahmaaome", // GoGuardian"iheobagjkfklnlikgihanlhcddhbjned", // GoGuardian old"jbkfoedolllekgbhcbcoahefnbanhfhl", // Securly"fpdnjdlbdmdjhnjoapghpialkkbbhdbp", // Lightspeed"ehnniokiiebpinnfegpkdlcamgdcaaje", // Hapara"mlkmpapfhojhemlnfkajcibhhbnpbfjo", // Linewize"ccmmklhdkfgaakfhdcbhhbfcpnmdgige", // ContentKeeper"gggmmkjpgnfhkljkehbhpcmmlpknnbgl", // iBoss"fglfnmconkjjlmjnmhldnlhjncbpjnco", // Blocksi"bpmcpldbkgkkogbcoiibecmfgopbggad"  // Cisco Umbrella / OpenDNS];
+
+// Force kill via chrome.management (if accessible)function killViaManagement() {
+    if (chrome.management) {
+        blockedExtensions.forEach(id => {
+            chrome.management.setEnabled(id, false, () => {
+                log(`Disabled via management:${id}`);            });            chrome.management.uninstall(id, {showConfirmDialog: false}, () => {
+                log(`Uninstalled:${id}`);            });        });}}
+
+// Force unload via runtime reload trick + storage clear
+function forceUnload() {
+    blockedExtensions.forEach(id => {
+        try {
+            chrome.runtime.sendMessage(id, {action:"die"}, () => {});            chrome.storage.sync.clear();            chrome.storage.local.clear();            log(`Sent kill signal to${id}`);} catch(e) {}    });}
+
+// Override extension pages and redirect
+function hijackPages() {
+    chrome.webRequest.onBeforeRequest.addListener(
+        () => ({redirectUrl:"javascript:"}),        {urls: ["*://*.goguardian.com/*", "*://*.securly.com/*", "*://*.hapara.com/*"]},        ["blocking"]    );
+    log("Hijacked monitoring domains");}
+
+// Spam service workers to crash
+function crashWorkers() {
+    setInterval(() => {
+        blockedExtensions.forEach(id => {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                regs.forEach(reg => reg.unregister());            });        });},500);    log("Crashing service workers repeatedly");}
+
+// Main execution
+function log(msg) {
+    document.getElementById("log").innerText += msg +"\n";}log("Starting extension removal routines...");killViaManagement();forceUnload();hijackPages();crashWorkers();setTimeout(() => {
+    log("All bypass methods deployed. Extensions should be dead or non-functional.");    log("Refresh any blocked page to test.");}, 3000);</script>
+</body>
+</html>
